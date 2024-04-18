@@ -1,0 +1,101 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Todo App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: TodoList(),
+    );
+  }
+}
+
+class TodoList extends StatefulWidget {
+  @override
+  _TodoListState createState() => _TodoListState();
+}
+
+class _TodoListState extends State<TodoList> {
+  final List<String> _todos = <String>[];
+  final TextEditingController _textFieldController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Lista de tarefas'),
+      ),
+      body: ListView(children: _getItems()),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _displayDialog(context),
+        tooltip: 'Adicionar tarefa',
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _addTodoItem(String title) {
+    setState(() {
+      _todos.add(title);
+    });
+    _textFieldController.clear();
+  }
+
+  Widget _buildTodoItem(String title) {
+    return ListTile(
+      title: Text(title),
+      trailing: IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: () {
+          setState(() {
+            _todos.remove(title);
+          });
+        },
+      ),
+    );
+  }
+
+  Future<void> _displayDialog(BuildContext context) async {
+    return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Adicione uma nova tarefa na lista'),
+            content: TextField(
+              controller: _textFieldController,
+              decoration: InputDecoration(hintText: 'Digite a tarefa aqui'),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Adicionar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _addTodoItem(_textFieldController.text);
+                },
+              ),
+              TextButton(
+                child: Text('Cancelar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+  }
+
+  List<Widget> _getItems() {
+    final List<Widget> _todoWidgets = <Widget>[];
+    for (String title in _todos) {
+      _todoWidgets.add(_buildTodoItem(title));
+    }
+    return _todoWidgets;
+  }
+}
